@@ -1,109 +1,148 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Jan  9 20:04:28 2022
-
-@author: tzvin
-"""
 import time
 from collections import defaultdict
-#%%import solutions
+from random import randrange
+
 solutionsList = open("solutionList.txt","r")
 solutions = solutionsList.read().split(',')
 solutionsList.close()
-# #%%import herrings  
+
 # herringsList=open("herringList.txt","r")
 # herrings=herringsList.read().split(',')
 # herringsList.close()     
-#%% define variables
+
 #alphabet=['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
-#%%function definitions
-def posPrompt():
-    """
-    Prints list of position choices (main menu>choice 2).
-    """
-    print('\n')
-    print('[1] Find test letter frequency for each position in a 5-letter word')
-    print('[2] Find most common position in solution words for each test letter')
-    print('[Q] Return to the previous screen')
-def excluPrompt():
-    """
-    Prints list of wordlist choices (main menu>choice 1).
-    """
-    print('\n')
-    print('[1] Find words which have at or over some minimum number of test letters')
-    print('[2] Find words which have fewer than some maximum number of test letters')
-    print('[Q] Return to the previous screen')
+
+#%%%%% prompts
 def mainPrompt():
+    """Prints main menu options and takes user input
     """
-    Prints list of main menu choices.
+    global mainChoice
+    global killSwitch
+    if killSwitch=='Q':
+        return
+    else:
+        print('\n')
+        print('Main Menu:')
+        print('[1] Information about overall frequency of letters')
+        print('[2] Information about frequency of letters in each position within solution words')
+        print('[3] Try a new set of letters')
+        print('[Q] Quit')
+        print('Your current test letters are',testLetters)
+        time.sleep(1)
+        currChoice=input("What would you like to do? \n")
+        currChoice=currChoice.strip(' ').upper()
+        killSwitch=currChoice
+        mainChoice=currChoice   
+    return 
+
+def listPrompt():
+    """Prints menu options for wordlists including/excluding letters and takes user input
     """
+    global listChoice
+    global killSwitch
     print('\n')
-    print('[1] Find possible solutions excluding/including some number of test letters')
-    print('[2] Find information about which position in a word tends to be occupied by which test letter')
-    print('[Q] Return to the previous screen')
+    print('Overall Frequency:')
+    print('[1] Find words which contain at least some minimum number of test letters')
+    print('[2] Find words which contain fewer than some maximum number of test letters')
+    print('[3] Return to the main menu')
+    print('[Q] Quit')
+    time.sleep(1)
+    currChoice=input("What would you like to do? \n")
+    currChoice=currChoice.strip(' ').upper()
+    killSwitch=currChoice
+    listChoice=currChoice
+    return
+
+def posPrompt():
+    """Prints menu options for position information
+    """
+    global posChoice
+    global killSwitch
+    print('\n')
+    print('Frequency by Position:')
+    print('[1] For each position (1 throught 5), sort letters in descending order by frequency')
+    print('[2] For each test letter, sort positions (1 through 5) in descending order by frequency')
+    print('[3] Return to the main menu')
+    print('[Q] Quit')
+    time.sleep(1)
+    currChoice=input("What would you like to do? \n")
+    currChoice=currChoice.strip(' ').upper()
+    killSwitch=currChoice
+    posChoice=currChoice
+    return
+#%%%%% function definitions for wordlist and position operations
 def newLetters():
-    global presentDict 
-    presentDict=defaultdict(list)
+    global presentDict
     global absentList
-    absentList=list()
     global presentList
-    presentList=list()
     global testLetters
-    testLetters = [str(x) for x in input("Enter test letters, separated by commas: ").split(",")]
+    
+    presentDict=defaultdict(list)
+    absentList=list()
+    presentList=list()
+    
+    letterSet = [str(x) for x in input("Enter test letters, separated by commas: ").split(",")]
     x=0
-    for item in testLetters:  
-       testLetters[x]=item.strip(' ').lower()
-       x=x+1
-       #make a list of words with at least one test letter and a list with no test letters
-    for i in range(6):
-        presentDict[i]=list()
+    for item in letterSet:
+        letterSet[x]=item.strip(' ').lower()
+        x=x+1
+    testLetters=letterSet
     for x in solutions:
         c=0
         for y in range(5):
             for z in testLetters:
                 if x[y]==z:
                     c=c+1
-        if c==0: 
+        if c==0:
             absentList.append(x)
         else: 
             presentDict[c].append(x)
             presentList.append(x)
+    return
 
-def wordsMin():
-    minNum=int(input('Enter a number (1-5) to find out how many possible solutions have at least that many spaces filled by test letters:\n'))
-    minCount=0
-    for key,value in newLetters()[0].items():
-        if int(key)>=minNum:
-            minCount=minCount+len(value)
-    print('\nWords with at least',minNum,'character(s) matching a test letter:\n',minCount,' out of ',len(solutions),'\n')
-    time.sleep(1)
-def wordsMax():
-    maxNum=int(input('Enter a number (1-5) to find out how many possible solutions have fewer than that many spaces filled by test letters:\n'))
-    maxCount=len(newLetters()[2])
-    for key,value in newLetters()[0].items():
-        if int(key)<maxNum:
-            maxCount=maxCount+len(value)
-    print('\nWords with fewer than',maxNum,'character(s) matching a test letter:\n',maxCount,' out of ',len(solutions),'\n')
-    time.sleep(1)
-def excludedWords():
-    excluPrompt()
-    numChoice=input("What would you like to do?\n")
-    numChoice=numChoice.strip(' ').upper()
-    while numChoice != 'Q':
-        if numChoice=='1':
-            wordsMin()
-            time.sleep(1)   
-        elif numChoice=='2':
-            wordsMax()
-            time.sleep(1)     
-        excluPrompt()
-        numChoice= input("What would you like to do?\n")
-        numChoice=numChoice.strip(' ').upper()
-#%%
-def letPerPos(posList):
-    posList=[]
-    perPos=dict()
+def listMin():
+    global minList
+    minList=[]
+    minNum=input('Enter a number (1-5) to find out how many possible solutions have at least that many spaces filled by test letters:\n')
+    for key,value in presentDict.items():
+        if int(key)>=int(minNum):
+            minList=[*minList,*value]
+    minCount=len(minList)
     print('\n')
+    print('Test letters:',testLetters)
+    print('Words with at least',minNum,'character(s) matching a test letter:\n',minCount,'out of',len(solutions))
+    time.sleep(1)
+    print('\n')
+    seeList=int(input('Would you like to see the list?\n[1] Yes \n[2] No\n'))
+    if seeList==1:
+        print('\n')
+        print(minList)
+    time.sleep(1)
+    return
+        
+def listMax():
+    global maxList
+    maxList=absentList
+    maxNum=int(input('Enter a number (1-5) to find out how many possible solutions have fewer than that many spaces filled by test letters:\n'))
+    for key,value in presentDict.items():
+        if int(key)<maxNum:
+            maxList=[*maxList,*value]
+    maxCount=len(maxList)
+    print('\n')
+    print('Test letters:',testLetters)
+    print('Words with fewer than',maxNum,'character(s) matching a test letter:\n',maxCount,'out of',len(solutions))
+    time.sleep(1)
+    print('\n')
+    seeList=int(input('Would you like to see the list?\n[1] Yes \n[2] No\n'))
+    if seeList==1:
+        print('\n')
+        print(maxList)
+    time.sleep(1)
+    return
+
+def byPos():
+    print('\n')
+    perPos=dict()
     for y in range(5):
         for z in testLetters:
             w=0
@@ -112,57 +151,78 @@ def letPerPos(posList):
                     w=w+1
             zUpper=z.upper()
             perPos[zUpper]=w
-        posList.append(sorted(perPos.items(), key=lambda x: x[1], reverse=True)) 
+        posList=sorted(perPos.items(), key= lambda x: x[1], reverse=True )
         print('Position',y+1)
-        for i in posList[y]:
-             print(i[0],':', i[1])
-        print('\n')     
-    time.sleep(1)
-    return posList
-def posPerLet(letList):
-    perLet=dict()
+        for (i,j) in enumerate(posList):
+            print(j[0],':',j[1])
+        print('\n')
+        time.sleep(1)
+    return
+
+def byLet():
     print('\n')
+    perLet=dict()
     for z in testLetters:
-        letList=[]
-        for y in range(5):
-            pos=(y+1)
-            c=0
-            # numDict={
-            #     }
+        for y in range(5):  
+            pos=y+1
+            w=0
             for x in solutions:
-                if str(x)[y]==z:
-                    c=c+1
-            perLet[pos]=c
-        letList=sorted(perLet.items(),key=lambda x:x[1], reverse=True)
-        print('Occurrences of',z.upper(),':')
+                if str(x)[y]==str(z):
+                    w=w+1
+            perLet[pos]=w
+        letList=sorted(perLet.items(), key= lambda x: x[1], reverse=True )
+        zUpper=z.upper()
+        print('Occurrences of',zUpper)
         for (i,j) in enumerate(letList):
-            print('Position',j[0],':',j[1])
-    time.sleep(1)                  
-def getPos():
-    posPrompt()
-    posChoice=input("What would you like to do?\n")
-    posChoice=posChoice.strip(' ').upper()
-    while posChoice!='Q':
-        if posChoice=='1':
-            letPerPos(posList)
-            time.sleep(1)
-        elif posChoice=='2':
-            posPerLet(letList)
-            time.sleep(1)
+            print(j[0],':',j[1])
+        print('\n')
+        time.sleep(1)
+    return
+
+#%%%%% definitions for option menus 
+
+def listMenu():
+    global killSwitch
+    while killSwitch != 'Q':
+        listPrompt()
+        if listChoice=='1':
+            listMin()
+        if listChoice=='2':
+            listMax()
+        if listChoice=='3':
+            return 
+        if listChoice=='Q':
+            killSwitch='Q'
+            return
+    return
+    return
+def posMenu():
+    global killSwitch
+    while killSwitch != 'Q':
         posPrompt()
-        posChoice=input("What would you like to do?\n")
-        posChoice=posChoice.strip(' ').upper()        
+        if posChoice=='1':
+            byPos()
+        if posChoice=='2':
+            byLet()
+        if posChoice=='3':
+            return
+        if posChoice=='Q':
+            killSwitch='Q'
+            return
+
+    return
+
 #%%
-choice=''
+killSwitch='A' 
+mainChoice='A'
 newLetters()
-while choice != 'X':
-    if choice=='Q':
+while killSwitch != 'Q':
+    if mainChoice=='1':
+        listMenu()
+    elif mainChoice=='2':
+        posMenu()
+    elif mainChoice=='3':
         newLetters()
-    if choice=='1':
-        excludedWords()
-    elif choice =='2':
-        getPos()
     mainPrompt()
-    choice = input("What would you like to do? ")
-    choice=choice.strip(' ').upper()
-print('Bye for now!')    
+print('\n')
+print('Goodbye for now!')
