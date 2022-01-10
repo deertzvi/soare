@@ -1,6 +1,5 @@
 import time
 from collections import defaultdict
-from random import randrange
 
 solutionsList = open("solutionList.txt","r")
 solutions = solutionsList.read().split(',')
@@ -10,7 +9,7 @@ solutionsList.close()
 # herrings=herringsList.read().split(',')
 # herringsList.close()     
 
-#alphabet=['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+alphabet=['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 
 #%%%%% prompts
 def mainPrompt():
@@ -128,9 +127,26 @@ def listMax():
         if int(key)<maxNum:
             maxList=[*maxList,*value]
     maxCount=len(maxList)
+    uncommonCount={
+    }
+    for a in alphabet:#for each letter
+        u=0 #start a new counter
+        for x in maxList:#for every word in the new list
+          for y in range(5): #for every letter in the word
+            if x[y]==a: #if it matches the current letter
+                u=u+1 #increase the letter count by one
+        uncommonCount[a]=u
+    maxDict=dict()
+    maxlistFreq=sorted(uncommonCount.items(), key=lambda x: x[1], reverse=True)
+    for y in range(9):
+        lett=maxlistFreq[y][0]
+        maxDict[lett]=maxlistFreq[y][1]
     print('\n')
     print('Test letters:',testLetters)
     print('Words with fewer than',maxNum,'character(s) matching a test letter:\n',maxCount,'out of',len(solutions))
+    print('Ten most common letters in this wordlist (in descending order of frequency):',maxDict)
+    print('\n')
+    
     time.sleep(1)
     print('\n')
     seeList=int(input('Would you like to see the list?\n[1] Yes \n[2] No\n'))
@@ -224,5 +240,4 @@ while killSwitch != 'Q':
     elif mainChoice=='3':
         newLetters()
     mainPrompt()
-print('\n')
-print('Goodbye for now!')
+print('Bye for now!')
