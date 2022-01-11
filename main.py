@@ -25,6 +25,7 @@ def mainPrompt():
         print('[1] Information about overall frequency of letters')
         print('[2] Information about frequency of letters in each position within solution words')
         print('[3] Try a new set of letters')
+        print('[4] Find co-occurrence patterns for a specific letter')
         print('[Q] Quit')
         print('Your current test letters are',testLetters)
         time.sleep(1)
@@ -113,7 +114,7 @@ def listMin():
     time.sleep(1)
     print('\n')
     seeList=int(input('Would you like to see the list?\n[1] Yes \n[2] No\n'))
-    if seeList==1:
+    if seeList==1 or seeList.strip(' ').lower()=='y':
         print('\n')
         print(minList)
     time.sleep(1)
@@ -150,13 +151,13 @@ def listMax():
     time.sleep(1)
     print('\n')
     seeList=int(input('Would you like to see the list?\n[1] Yes \n[2] No\n'))
-    if seeList==1:
+    if seeList==1 or seeList.strip(' ').lower()=='y':
         print('\n')
         print(maxList)
     time.sleep(1)
     return
 
-def byPos():
+def byPos(testLetters,solutions):
     print('\n')
     perPos=dict()
     for y in range(5):
@@ -175,14 +176,14 @@ def byPos():
         time.sleep(1)
     return
 
-def byLet():
+def byLet(letters,words):
     print('\n')
     perLet=dict()
-    for z in testLetters:
+    for z in letters:
         for y in range(5):  
             pos=y+1
             w=0
-            for x in solutions:
+            for x in words:
                 if str(x)[y]==str(z):
                     w=w+1
             perLet[pos]=w
@@ -195,6 +196,40 @@ def byLet():
         time.sleep(1)
     return
 
+def findFreq(testLetter):
+    global findFreqList
+    findFreqList=list()
+    z=str(testLetter)
+    for x in solutions:
+        c=0
+        for y in range(5):
+            if x[y]==z:
+                c=c+1
+                findFreqList.append(x)
+    return
+def findFriends():
+    wantLet=input('Choose a letter to see what it tends to co-occur with:')
+    firstLet=wantLet.strip(' ').lower()
+    findFreq(firstLet)
+    friendFreq=dict()
+    for a in alphabet:
+        if a==firstLet:
+            continue
+        p=0
+        for y in range(5):
+            for x in findFreqList:
+                if str(x)[y]==str(a):
+                    p=p+1
+        friendFreq[a]=p
+    sortFriends=sorted(friendFreq.items(),key=lambda x: x[1], reverse=True)
+    bestFriends=[firstLet]
+    for y in range(5):
+        newFriend=sortFriends[y][0]
+        bestFriends.append(newFriend)
+    print(firstLet.upper(),'most commonly occurs with:',bestFriends[1:])
+    wantByLet=input("See position information for these letters?\n[1] Yes\n[2] No\n")
+    if wantByLet=='1' or wantByLet.strip(' ').lower()=='y':
+        byLet(bestFriends,findFreqList)
 #%%%%% definitions for option menus 
 
 def listMenu():
@@ -217,9 +252,9 @@ def posMenu():
     while killSwitch != 'Q':
         posPrompt()
         if posChoice=='1':
-            byPos()
+            byPos(testLetters,solutions)
         if posChoice=='2':
-            byLet()
+            byLet(testLetters,solutions)
         if posChoice=='3':
             return
         if posChoice=='Q':
@@ -239,5 +274,7 @@ while killSwitch != 'Q':
         posMenu()
     elif mainChoice=='3':
         newLetters()
+    elif mainChoice=='4':
+        findFriends()
     mainPrompt()
 print('Bye for now!')
