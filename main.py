@@ -114,7 +114,7 @@ def listMin():
     time.sleep(1)
     print('\n')
     seeList=int(input('Would you like to see the list?\n[1] Yes \n[2] No\n'))
-    if seeList==1 or seeList.strip(' ').lower()=='y':
+    if seeList==1:
         print('\n')
         print(minList)
     time.sleep(1)
@@ -151,7 +151,7 @@ def listMax():
     time.sleep(1)
     print('\n')
     seeList=int(input('Would you like to see the list?\n[1] Yes \n[2] No\n'))
-    if seeList==1 or seeList.strip(' ').lower()=='y':
+    if seeList==1:
         print('\n')
         print(maxList)
     time.sleep(1)
